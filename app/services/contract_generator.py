@@ -34,6 +34,7 @@ The Markdown document MUST contain ONLY these sections, in this order:
    - Base URL
    - Authentication method (or "None")
    - Content type (e.g. application/json)
+   - A note stating that this document reflects observed or inferred behavior and that consumers should refer to the downstream service's own documentation for authoritative details, edge cases, rate limits, and advanced usage not captured here.
 
 3. `## Endpoints`
    A Markdown table with columns: Method | Path | Description
@@ -52,6 +53,7 @@ The Markdown document MUST contain ONLY these sections, in this order:
 
 STRICT RULES — violations are not acceptable:
 - The Markdown document MUST end after the last `### \`METHOD /path\`` subsection. No sections after that.
+- The downstream service reference note MUST appear inside `## Overview`, not as a standalone section.
 - The `<openapi>` block MUST NOT contain internal implementation details, utility calls, or exception logic unless they are part of the public contract (e.g. status codes).
 - Do NOT add: Data Models, Notes, Observations, Caveats, Warnings, Examples, Request Examples, Request Headers, Summary tables beyond section 3, or any section not listed above.
 - Do NOT add blockquotes, callout boxes, or ⚠️ notices.
