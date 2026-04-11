@@ -1,0 +1,583 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Restful API Dev - Objects API",
+    "description": "A simple RESTful API for managing objects (consumer electronics / gadgets). Hosted at restful-api.dev, it supports full CRUD operations on generic \"objects\" that each carry an arbitrary key/value data payload.\n",
+    "version": "1.0.0",
+    "contact": {
+      "url": "https://restful-api.dev"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.restful-api.dev",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Objects",
+      "description": "Operations on generic objects"
+    }
+  ],
+  "paths": {
+    "/objects": {
+      "get": {
+        "tags": [
+          "Objects"
+        ],
+        "summary": "List all objects",
+        "description": "Returns an array of all objects stored in the API. Each object has a unique string `id`, a human-readable `name`, and an optional `data` field that contains an arbitrary set of key/value pairs describing the object's attributes. The structure of `data` is not fixed and varies per object.\n",
+        "operationId": "listObjects",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Filter results by one or more object IDs. Repeat the parameter to request multiple IDs (e.g. `?id=3&id=5&id=10`).\n",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "example": [
+              "3",
+              "5",
+              "10"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON array of object resources.",
+            "headers": {
+              "Content-Type": {
+                "schema": {
+                  "type": "string",
+                  "example": "application/json;charset=UTF-8"
+                }
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-cache, no-store, max-age=0, must-revalidate"
+                }
+              },
+              "X-Content-Type-Options": {
+                "schema": {
+                  "type": "string",
+                  "example": "nosniff"
+                }
+              },
+              "X-Frame-Options": {
+                "schema": {
+                  "type": "string",
+                  "example": "DENY"
+                }
+              },
+              "X-XSS-Protection": {
+                "schema": {
+                  "type": "string",
+                  "example": "1; mode=block"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ObjectResource"
+                  }
+                },
+                "examples": {
+                  "objectList": {
+                    "summary": "Sample list response",
+                    "value": [
+                      {
+                        "id": "1",
+                        "name": "Google Pixel 6 Pro",
+                        "data": {
+                          "color": "Cloudy White",
+                          "capacity": "128 GB"
+                        }
+                      },
+                      {
+                        "id": "2",
+                        "name": "Apple iPhone 12 Mini, 256GB, Blue",
+                        "data": null
+                      },
+                      {
+                        "id": "7",
+                        "name": "Apple MacBook Pro 16",
+                        "data": {
+                          "year": 2019,
+                          "price": 1849.99,
+                          "CPU model": "Intel Core i9",
+                          "Hard disk size": "1 TB"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 one or more query parameters are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Objects"
+        ],
+        "summary": "Create a new object",
+        "description": "Creates a new object. The `name` field is required. The `data` field is optional and may contain any arbitrary key/value pairs. The server assigns a unique `id` to the new object and returns the created resource.\n",
+        "operationId": "createObject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectInput"
+              },
+              "examples": {
+                "newPhone": {
+                  "summary": "Create a phone object",
+                  "value": {
+                    "name": "Apple iPhone 15 Pro",
+                    "data": {
+                      "color": "Natural Titanium",
+                      "capacity": "256 GB",
+                      "price": 999.99
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The newly created object resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 request body is missing or malformed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "The unique string identifier of the object.",
+          "schema": {
+            "type": "string"
+          },
+          "example": "7"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Objects"
+        ],
+        "summary": "Retrieve a single object",
+        "description": "Returns a single object identified by its `id`.",
+        "operationId": "getObjectById",
+        "responses": {
+          "200": {
+            "description": "The requested object resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectResource"
+                },
+                "examples": {
+                  "macbookPro": {
+                    "summary": "Apple MacBook Pro 16",
+                    "value": {
+                      "id": "7",
+                      "name": "Apple MacBook Pro 16",
+                      "data": {
+                        "year": 2019,
+                        "price": 1849.99,
+                        "CPU model": "Intel Core i9",
+                        "Hard disk size": "1 TB"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Object with the specified `id` was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "notFound": {
+                    "value": {
+                      "error": "Oject with id=99 was not found. Checkout list of all objects on method Get Objects"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Objects"
+        ],
+        "summary": "Replace an object (full update)",
+        "description": "Fully replaces an existing object identified by its `id`. All fields (`name`, `data`) must be supplied; omitted fields are cleared.\n",
+        "operationId": "replaceObject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectInput"
+              },
+              "examples": {
+                "updatePhone": {
+                  "summary": "Replace a phone object",
+                  "value": {
+                    "name": "Apple iPhone 15 Pro Max",
+                    "data": {
+                      "color": "Black Titanium",
+                      "capacity": "512 GB",
+                      "price": 1199.99
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated object resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 request body is missing or malformed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Object with the specified `id` was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Objects"
+        ],
+        "summary": "Partially update an object",
+        "description": "Applies a partial update to an existing object identified by its `id`. Only the supplied fields are updated; all other fields retain their current values.\n",
+        "operationId": "patchObject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectPatch"
+              },
+              "examples": {
+                "patchPrice": {
+                  "summary": "Update only the name",
+                  "value": {
+                    "name": "Apple iPhone 15 Pro Max (Updated)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The patched object resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectResource"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request \u2013 request body is missing or malformed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Object with the specified `id` was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Objects"
+        ],
+        "summary": "Delete an object",
+        "description": "Permanently deletes the object identified by its `id`.",
+        "operationId": "deleteObject",
+        "responses": {
+          "200": {
+            "description": "Confirmation message that the object was deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                },
+                "examples": {
+                  "deleted": {
+                    "value": {
+                      "message": "Object with id = 7 has been deleted."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Object with the specified `id` was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ObjectData": {
+        "type": "object",
+        "description": "An arbitrary, schema-less map of key/value pairs describing an object's attributes. Keys and value types vary per object. Common keys observed include: color, capacity, price, year, generation, screen size, CPU model, hard disk size, strap colour, case size, and description.\n",
+        "additionalProperties": true,
+        "nullable": true,
+        "example": {
+          "color": "Cloudy White",
+          "capacity": "128 GB",
+          "price": 389.99
+        }
+      },
+      "ObjectResource": {
+        "type": "object",
+        "description": "Represents a stored object resource returned by the API.",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object, assigned by the server. Stored as a string even when the value is numeric.\n",
+            "example": "7"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the object.",
+            "minLength": 1,
+            "example": "Apple MacBook Pro 16"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ObjectData"
+          }
+        },
+        "example": {
+          "id": "7",
+          "name": "Apple MacBook Pro 16",
+          "data": {
+            "year": 2019,
+            "price": 1849.99,
+            "CPU model": "Intel Core i9",
+            "Hard disk size": "1 TB"
+          }
+        }
+      },
+      "ObjectInput": {
+        "type": "object",
+        "description": "Request body for creating or fully replacing an object.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the object.",
+            "minLength": 1,
+            "example": "Apple iPhone 15 Pro"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ObjectData"
+          }
+        }
+      },
+      "ObjectPatch": {
+        "type": "object",
+        "description": "Request body for a partial update. All fields are optional; only supplied fields are updated.\n",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the object.",
+            "minLength": 1,
+            "example": "Apple iPhone 15 Pro (Updated)"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ObjectData"
+          }
+        }
+      },
+      "DeleteResponse": {
+        "type": "object",
+        "description": "Confirmation payload returned after a successful deletion.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Object with id = 7 has been deleted."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error payload returned for 4xx and 5xx responses.",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Human-readable error message.",
+            "example": "Oject with id=99 was not found. Checkout list of all objects on method Get Objects"
+          }
+        }
+      }
+    }
+  }
+}

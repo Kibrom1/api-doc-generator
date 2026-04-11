@@ -1,0 +1,210 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Employee Management System API",
+    "description": "REST API for managing employee records including creation, retrieval, update, and deletion.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/employee": {
+      "post": {
+        "summary": "Create a new employee",
+        "operationId": "createEmployee",
+        "tags": [
+          "Employee"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DtoEmployee"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Employee created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DtoEmployee"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieve all employees",
+        "operationId": "findAllEmployee",
+        "tags": [
+          "Employee"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all employees retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DtoEmployee"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employee/{id}": {
+      "get": {
+        "summary": "Retrieve an employee by ID",
+        "operationId": "findById",
+        "tags": [
+          "Employee"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The unique identifier of the employee"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DtoEmployee"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found for the given ID"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing employee by ID",
+        "operationId": "updateEmployee",
+        "tags": [
+          "Employee"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The unique identifier of the employee to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DtoEmployee"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Employee updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DtoEmployee"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found for the given ID"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an employee by ID",
+        "operationId": "deleteEmployee",
+        "tags": [
+          "Employee"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The unique identifier of the employee to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee deleted successfully",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "This Employee is Deleted successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found for the given ID"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DtoEmployee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier of the employee"
+          },
+          "firstname": {
+            "type": "string",
+            "description": "First name of the employee"
+          },
+          "lastname": {
+            "type": "string",
+            "description": "Last name of the employee"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address of the employee"
+          }
+        },
+        "required": [
+          "firstname",
+          "email"
+        ]
+      }
+    }
+  }
+}
