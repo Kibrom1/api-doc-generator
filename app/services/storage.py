@@ -117,6 +117,15 @@ def load_contract(slug: str, timestamp: str) -> GeneratedContract | None:
     )
 
 
+def update_markdown(slug: str, timestamp: str, markdown_doc: str) -> bool:
+    """Overwrite contract.md for an existing contract. Returns False if not found."""
+    contract_dir = Path(settings.output_dir) / slug / timestamp
+    if not contract_dir.exists():
+        return False
+    (contract_dir / "contract.md").write_text(markdown_doc, encoding="utf-8")
+    return True
+
+
 def _read_meta(contract_dir: Path) -> dict | None:
     """Read meta.json from a contract directory if it exists."""
     meta_file = contract_dir / "meta.json"
